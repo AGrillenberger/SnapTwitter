@@ -1,0 +1,32 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SnapTwitter:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SnapTwitter_jar</output-path>
+    <root id="archive" name="SnapTwitter.jar">
+      <element id="module-output" name="SnapTwitter" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/guava/guava/14.0.1/guava-14.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpcore/4.2.4/httpcore-4.2.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient/4.2.5/httpclient-4.2.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-nop/1.7.15/slf4j-nop-1.7.15.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/twitter/joauth/6.0.2/joauth-6.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/twitter/hbc-core/2.2.0/hbc-core-2.2.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/twitter4j/twitter4j-core/4.0.3/twitter4j-core-4.0.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.6/commons-codec-1.6.jar" path-in-jar="/" />
+      <element id="module-test-output" name="SnapTwitter" />
+      <element id="library" level="project" name="Maven: com.twitter:hbc-core:2.2.0" />
+      <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient:4.2.5" />
+      <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpcore:4.2.4" />
+      <element id="library" level="project" name="Maven: commons-logging:commons-logging:1.1.1" />
+      <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.6" />
+      <element id="library" level="project" name="Maven: com.google.guava:guava:14.0.1" />
+      <element id="library" level="project" name="Maven: com.twitter:joauth:6.0.2" />
+      <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:1.3.9" />
+      <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.5" />
+      <element id="library" level="project" name="Maven: org.twitter4j:twitter4j-core:4.0.3" />
+      <element id="library" level="project" name="Maven: org.slf4j:slf4j-nop:1.7.15" />
+      <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
+    </root>
+  </artifact>
+</component>

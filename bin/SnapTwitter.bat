@@ -1,1 +1,0 @@
-java -jar SnapTwitter.jar

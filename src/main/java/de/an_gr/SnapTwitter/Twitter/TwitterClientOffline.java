@@ -1,6 +1,6 @@
 package de.an_gr.SnapTwitter.Twitter;
 
-import de.an_gr.SnapTwitter.SnapTwitter;
+import de.an_gr.SnapTwitter.SnapTwitterMain;
 
 /**
  * Created by Andreas on 10.02.2016.
@@ -11,7 +11,7 @@ public class TwitterClientOffline extends TwitterClient {
 
     public String getTweet() {
         numRead++;
-        return SnapTwitter.getCachedMessage();
+        return SnapTwitterMain.getCachedMessage();
     }
 
     public int getNumRead() {

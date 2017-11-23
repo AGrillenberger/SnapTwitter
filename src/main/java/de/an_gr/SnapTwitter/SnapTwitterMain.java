@@ -1,27 +1,34 @@
 package de.an_gr.SnapTwitter;
 
-
 import de.an_gr.SnapTwitter.Debugger.Debugger;
 import de.an_gr.SnapTwitter.HttpServer.HttpServer;
 import de.an_gr.SnapTwitter.Twitter.TwitterAuth;
 import de.an_gr.SnapTwitter.Twitter.TwitterClient;
 import de.an_gr.SnapTwitter.Twitter.TwitterClientOffline;
 
+import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * SnapTwitter Main Class
- *
- * @author Andreas Grillenberger, FAU
+ * Created by Andreas on 03.03.2016.
  */
+public class SnapTwitterMain {
+    private JButton btnStartSnap, btnExitSnapTwitter;;
+    private JPanel pnl;
+    private JLabel lblHeading, lblMessage, lblProcessed, lblReceived, lblConnected, lblOnline;
+    private static int fontSize = 14, windowWidth = 300, windowHeight = 300;
 
-public class SnapTwitter {
     /* References to the parts of the helper and the running threads */
     static TwitterClient twClient = null;
     static HttpServer httpServ = null;
@@ -35,17 +42,59 @@ public class SnapTwitter {
     /* Stores whether snap! is connected to the helper */
     static public Boolean snapRunning = false;
 
-    /**
-     * Main function
-     * @param args --offline: get tweets from cache; --createCache: build new cache file
-     */
+    public SnapTwitterMain() {
+        btnStartSnap.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                launchSnap();
+            }
+        });
+        btnExitSnapTwitter.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                endHelper();
+            }
+        });
+    }
+
     public static void main(String[] args) {
-        if(loadBlockXML() == "") {
+        fontSize = UIManager.getFont("Label.font").getSize() + 1;
+
+        int dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+        double scaling = dpi/96d;
+        fontSize *= scaling;
+        windowHeight *= scaling;
+        windowWidth *= scaling;
+
+        UIManager.put("Label.font", new FontUIResource(new Font("Dialog", Font.PLAIN, fontSize)));
+        UIManager.put("Button.font", new FontUIResource(new Font("Dialog", Font.PLAIN, fontSize)));
+        UIManager.put("TextField.font", new FontUIResource(new Font("Dialog", Font.PLAIN, fontSize)));
+
+        JFrame frame = new JFrame("SnapTwitterMain");
+        SnapTwitterMain stm = new SnapTwitterMain();
+        frame.setContentPane(stm.pnl);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+
+        frame.setSize(new Dimension(windowWidth, windowHeight));
+
+        stm.lblHeading.setText("SnapTwitter loading...");
+        stm.lblMessage.setText("");
+        stm.lblConnected.setText("");
+        stm.lblOnline.setText("");
+        stm.lblReceived.setText("");
+        stm.lblProcessed.setText("");
+
+        frame.setVisible(true);
+
+        if (loadBlockXML() == "") {
             return;
         }
 
         /* Running offline? */
-        if(Arrays.asList(args).contains("--offline")) {
+        int runOffline = JOptionPane.showOptionDialog(frame, "Should SnapTwitter run online or offline?", "Online or Offline?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Online", "Offline"}, 0);
+        System.err.print("" + runOffline);
+        if (runOffline == 1) {
             offline = true;
             twClient = new TwitterClientOffline();
 
@@ -68,16 +117,16 @@ public class SnapTwitter {
         }
 
         /* create cache if --createCache is set */
-        if(Arrays.asList(args).contains("--createCache")) {
+        if (Arrays.asList(args).contains("--createCache")) {
             createCache = true;
             cache = new ArrayList<>();
         }
 
         /* Initialize the HTTP Server and wait until it is ready*/
-        httpServ = new HttpServer(twClient, Integer.parseInt(SnapTwitter.getProperty("port")));
+        httpServ = new HttpServer(twClient, Integer.parseInt(SnapTwitterMain.getProperty("port")));
         httpThread = new Thread(httpServ);
         httpThread.start();
-        while(!httpServ.isReady()) {
+        while (!httpServ.isReady()) {
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {
@@ -87,7 +136,7 @@ public class SnapTwitter {
         Debugger.log("Main: http is ready");
 
         /* Generate authentication tokens if not running offline */
-        if(!offline)
+        if (!offline)
             TwitterAuth.prepareAuth();
 
         /* Start the Twitter client */
@@ -97,10 +146,10 @@ public class SnapTwitter {
         /* Define shutdown hook, especially needed for creating a cache */
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             public void run() {
-                if(twClient != null)
+                if (twClient != null)
                     twClient.disconnect();
 
-                if(createCache) {
+                if (createCache) {
                     try {
                         TimeUnit.SECONDS.sleep(1);
                         FileOutputStream fout = new FileOutputStream("tweetCache.ser", false);
@@ -119,23 +168,18 @@ public class SnapTwitter {
         }, "CleanUp-thread"));
 
         /* Output for the user */
-        System.out.println("----------------------------");
-        System.out.println("--- SnapTwitter is ready ---");
-        System.out.println("----------------------------");
-        System.out.println();
-        System.out.println("If Snap! does not start automatically, open your browser with the URL: http://snap.berkeley.edu/snapsource/snap.html#open:http://" + getLocalAdress() + "/getBlockXML");
-        System.out.println();
+        String headingTxt = "SnapTwitter is ready!";
+        String messageTxt = "Start Snap using the button below or<br />open your browser with the following URL:<br />" +
+                "http://" + getLocalAdress() + "/snap/start.html";
 
-        if(createCache) {
-            System.out.println("Tweet cache is being generated");
-            System.out.println("");
+        if (createCache) {
+            messageTxt += "<br /><br />Tweet cache is being generated";
         }
 
-        /* Now launch snap! */
-        launchSnap();
+        stm.lblHeading.setText(headingTxt);
+        stm.lblMessage.setText("<html>" + messageTxt + "<br /><br />SnapTwitter was not initialized yet in Snap.<br />Go to Snap and use the 'twitter: prepare' block.");
 
-        System.out.print("SnapTwitter was not initialized yet in Snap. Go to Snap and use the 'twitter: prepare' block.");
-
+    /* Now launch snap! */
         /* Wait until snap! is running */
         synchronized (snapRunning) {
             try {
@@ -145,24 +189,19 @@ public class SnapTwitter {
             }
         }
 
-        System.out.println("\rTo exit the SnapTwitter helper, use the corresponding block in Snap! or press CTRL+C.");
-        System.out.println();
+        stm.lblMessage.setText("SnapTwitter is now ready to use.");
 
-        /* Generate and show some statistics */
+    /* Generate and show some statistics */
         long startTime = new Date().getTime();
         long curTime = 0;
-        while(true) {
+        while (true) {
             int nr = twClient.getNumRead(), ns = twClient.getNumStored();
-            if(!twClient.isDone())
+            if (!twClient.isDone())
                 curTime = new Date().getTime();
 
-            System.out.format("\rcurrently %sconnected to twitter | tweets received: %5d (%3.2f/s) | tweets read: %5d (%3.2f/s)",
-                    (twClient.isDone() ? "not " : ""),
-                    ns,
-                    (float) ns / (curTime - startTime) * 1000,
-                    nr,
-                    (float) nr / (curTime - startTime) * 1000
-            );
+            stm.lblOnline.setText((twClient.isDone() ? "Offline" : "Online"));
+            stm.lblReceived.setText("" + ns + " (" + ((float) ns / (curTime - startTime) * 1000) + "/s)");
+            stm.lblProcessed.setText("" + nr + " (" + ((float) nr / (curTime - startTime) * 1000) + "/s)");
 
             try {
                 TimeUnit.SECONDS.sleep(1);
@@ -172,19 +211,21 @@ public class SnapTwitter {
         }
     }
 
-    /**
-     * Ends the helper application
-     */
+        /**
+         * Ends the helper application
+         */
+
     public static void endHelper() {
         System.exit(0);
     }
 
     /**
      * Writes a message to the cache
+     *
      * @param msg
      */
     public static void writeToCache(String msg) {
-        if(!createCache)
+        if (!createCache)
             return;
 
         cache.add(msg);
@@ -192,19 +233,25 @@ public class SnapTwitter {
 
     /**
      * Reads a message from the cache
+     *
      * @return
      */
     public static String getCachedMessage() {
-        if(cache == null)
+        if (cache == null)
             return null;
-        String msg = cache.get(0);
-        cache.remove(0);
+
+        String msg = "";
+        do {
+            msg = cache.get(0);
+            cache.remove(0);
+        } while(msg == "" || msg.length() < 100);
 
         return msg;
     }
 
     /**
      * Is the Twitter client online or offline?
+     *
      * @return
      */
     public static boolean isOffline() {
@@ -216,7 +263,7 @@ public class SnapTwitter {
      */
     public static void launchSnap() {
         Runtime rt = Runtime.getRuntime();
-        String url = getProperty("snapURL") + "#open:http://" + getLocalAdress() + "/getBlockXML";
+        String url = "http://" + getLocalAdress() + "/snap/start.html";//getProperty("snapURL") + "#open:http://" + getLocalAdress() + "/getBlockXML";
 
         String os = System.getProperty("os.name").toLowerCase();
         try {
@@ -234,6 +281,7 @@ public class SnapTwitter {
 
     /**
      * Reads a value from the default property file
+     *
      * @param name
      * @return
      */
@@ -243,6 +291,7 @@ public class SnapTwitter {
 
     /**
      * Reads a value from a defined property file
+     *
      * @param name
      * @param propertyFile
      * @return
@@ -250,15 +299,15 @@ public class SnapTwitter {
     public static String getProperty(String name, String propertyFile) {
         Properties properties = new Properties();
         try {
-                ClassLoader cl = SnapTwitter.class.getClassLoader();
-                InputStream is = cl.getResourceAsStream(propertyFile);
-                if(is == null) {
-                    System.err.println("Properties file not found: " + propertyFile);
-                    System.exit(1);
-                }
-                BufferedInputStream stream = new BufferedInputStream(is);
-                properties.load(stream);
-                stream.close();
+            ClassLoader cl = SnapTwitterMain.class.getClassLoader();
+            InputStream is = cl.getResourceAsStream(propertyFile);
+            if (is == null) {
+                System.err.println("Properties file not found: " + propertyFile);
+                System.exit(1);
+            }
+            BufferedInputStream stream = new BufferedInputStream(is);
+            properties.load(stream);
+            stream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -268,35 +317,36 @@ public class SnapTwitter {
     public static String getLocalAdress() {
         String hostName, canonicalHostName;
         try {
-             hostName = InetAddress.getLocalHost().getHostName();
-             canonicalHostName = InetAddress.getLocalHost().getCanonicalHostName();
+            hostName = InetAddress.getLocalHost().getHostName();
+            canonicalHostName = InetAddress.getLocalHost().getCanonicalHostName();
         } catch (UnknownHostException e) {
             hostName = "localhost";
             canonicalHostName = "localhost";
         }
 
-        if(hostName == null || hostName.length() <= 1)
+        if (hostName == null || hostName.length() <= 1)
             hostName = "localhost";
 
-        return hostName + ":" + SnapTwitter.getProperty("port");
+        return hostName + ":" + SnapTwitterMain.getProperty("port");
     }
 
     public static String loadResourceAsString(String filename) {
-        ClassLoader classLoader = SnapTwitter.class.getClassLoader();
+        ClassLoader classLoader = SnapTwitterMain.class.getClassLoader();
         InputStream is = classLoader.getResourceAsStream(filename);
-        if(is == null)
+        if (is == null)
             return null;
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         StringBuffer sb = new StringBuffer();
         String line;
 
         try {
-            while((line = br.readLine()) != null)
+            while ((line = br.readLine()) != null)
                 sb.append(line);
 
             br.close();
             is.close();
-        } catch (IOException e) { }
+        } catch (IOException e) {
+        }
 
         return sb.toString();
     }
@@ -312,10 +362,9 @@ public class SnapTwitter {
 
         if (m.find()) {
             String addr = m.group(2);
-            if(addr != null && addr.length() > 1)
-                blocks = blocks.replaceAll(addr, getLocalAdress());
+            if (addr != null && addr.length() > 1)
+                blocks = blocks.replaceAll(addr, getLocalAdress() );
         }
-
         return blocks;
     }
 }

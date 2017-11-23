@@ -1,6 +1,6 @@
 package de.an_gr.SnapTwitter.Twitter;
 
-import de.an_gr.SnapTwitter.SnapTwitter;
+import de.an_gr.SnapTwitter.SnapTwitterMain;
 
 import java.util.concurrent.Semaphore;
 
@@ -21,7 +21,7 @@ public class SingleTweetStore {
             e.printStackTrace();
         }
         msgStore = msg;
-        SnapTwitter.writeToCache(msg);
+        SnapTwitterMain.writeToCache(msg);
         if(msg != null)
             numStored++;
         lock.release();

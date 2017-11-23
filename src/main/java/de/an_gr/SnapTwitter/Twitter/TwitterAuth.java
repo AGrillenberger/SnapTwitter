@@ -1,7 +1,7 @@
 package de.an_gr.SnapTwitter.Twitter;
 
 import de.an_gr.SnapTwitter.Debugger.Debugger;
-import de.an_gr.SnapTwitter.SnapTwitter;
+import de.an_gr.SnapTwitter.SnapTwitterMain;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -25,18 +25,18 @@ public class TwitterAuth {
     private static boolean loginReady = false;
 
     public static void prepareAuth() {
-        if(SnapTwitter.isOffline() || loginReady()) {
+        if(SnapTwitterMain.isOffline() || loginReady()) {
             return;
         }
 
-        consumerKey = SnapTwitter.getProperty("consumerKey", "de/an_gr/SnapTwitter/apikeys.properties");
-        consumerSecret = SnapTwitter.getProperty("consumerSecret", "de/an_gr/SnapTwitter/apikeys.properties");
+        consumerKey = SnapTwitterMain.getProperty("consumerKey", "de/an_gr/SnapTwitter/apikeys.properties");
+        consumerSecret = SnapTwitterMain.getProperty("consumerSecret", "de/an_gr/SnapTwitter/apikeys.properties");
 
         Twitter twc = TwitterFactory.getSingleton();
         twc.setOAuthConsumer(consumerKey, consumerSecret);
 
         try {
-            rqt = twc.getOAuthRequestToken("http://" + SnapTwitter.getLocalAdress() + "/authCallback");
+            rqt = twc.getOAuthRequestToken("http://" + SnapTwitterMain.getLocalAdress() + "/authCallback");
             requestTokenKey = rqt.getToken();
             requestSecret = rqt.getTokenSecret();
             authURL = rqt.getAuthenticationURL();
@@ -61,21 +61,21 @@ public class TwitterAuth {
             loginReady = true;
         }
 
-        synchronized(SnapTwitter.snapRunning) {
-            SnapTwitter.snapRunning.notify();
+        synchronized(SnapTwitterMain.snapRunning) {
+            SnapTwitterMain.snapRunning.notify();
         }
     }
 
     public static boolean loginReady() {
-        if(SnapTwitter.isOffline())
-            synchronized(SnapTwitter.snapRunning) {
-                SnapTwitter.snapRunning.notify();
+        if(SnapTwitterMain.isOffline())
+            synchronized(SnapTwitterMain.snapRunning) {
+                SnapTwitterMain.snapRunning.notify();
             }
-        return loginReady | SnapTwitter.isOffline();
+        return loginReady | SnapTwitterMain.isOffline();
     }
 
     public static String getAuthURL() {
-        if(SnapTwitter.isOffline() | loginReady())
+        if(SnapTwitterMain.isOffline() | loginReady())
             return "//NOAUTH//";
         Debugger.log("TwitterAuth: authURL is " + authURL);
         return authURL;

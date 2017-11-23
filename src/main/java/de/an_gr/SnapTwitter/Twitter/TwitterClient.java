@@ -23,6 +23,8 @@ public class TwitterClient implements Runnable {
     List<Location> geo;
     boolean onlyWithGeo = true;
 
+    boolean useHTTPS = false;
+
     SingleTweetStore tweetStore = new SingleTweetStore();
 
     public void run() {
@@ -31,7 +33,11 @@ public class TwitterClient implements Runnable {
     public void connect() {
         Debugger.log("twClient: Connect called");
 
-        Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
+        Hosts hosebirdHosts;
+        if(useHTTPS)
+            hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
+        else
+            hosebirdHosts = new HttpHosts("https://stream.twitter.com");
 
         StreamingEndpoint hosebirdEndpoint;
         if (terms == null && langs == null && geo == null && !onlyWithGeo)

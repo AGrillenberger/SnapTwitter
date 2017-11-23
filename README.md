@@ -1,4 +1,4 @@
-#SnapTwitter
+# SnapTwitter
 
 ## What is SnapTwitter?
 SnapTwitter is an extension for the Snap! programming environment ([snap.berkeley.edu](http://snap.berkeley.edu)).

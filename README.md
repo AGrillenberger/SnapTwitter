@@ -11,6 +11,8 @@ If you want to use this tool in school, feel free to contact me at andreas.grill
 * Twitter account as this is required for accessing the Twitter API
 
 ## How to use SnapTwitter?
+SnapTwitter can be downloaded at <http://wwwcip.cs.fau.de/~siangril/SnapTwitter-current.zip>
+
 1. Start SnapTwitter using ``snaptwitter.bat`` (on Windows) or ``snaptwitter.sh`` (on Linux or OS X)
 2. Snap! should load automatically in your default browser with the SnapTwitter blocks preloaded. If this is not the case, start it using http://snap.berkeley.edu/snapsource/snap.html#open:http://localhost:13337/getBlockXML
 3. Check if the SnapTwitter blocks were loaded: e.g. there should be a "twitter: prepare" block in the _control_ section

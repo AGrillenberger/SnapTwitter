@@ -1,5 +1,9 @@
 # SnapTwitter
 
+This version of SnapTwitter is no longer actively maintained. It has been replaced by a completely reprogrammed version: https://github.com/AGrillenberger/SnapTwitter2
+
+# Old description
+
 ## What is SnapTwitter?
 SnapTwitter is an extension for the Snap! programming environment ([snap.berkeley.edu](http://snap.berkeley.edu)).
 
